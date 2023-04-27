@@ -9,8 +9,8 @@
   "database": {
     "host": "localhost",
     "port": "5432",
-    "user": "postgres",
+    "user": "",
     "pass": "",
-    "name": "62tek"
+    "name": ""
   }
 }
