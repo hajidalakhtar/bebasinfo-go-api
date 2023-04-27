@@ -1,0 +1,16 @@
+{
+  "server": {
+    "address": ":3000"
+  },
+  "context": {
+    "timeout": 2
+  },
+  "secretKey": "62tek",
+  "database": {
+    "host": "localhost",
+    "port": "5432",
+    "user": "postgres",
+    "pass": "",
+    "name": "62tek"
+  }
+}
