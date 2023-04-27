@@ -3,11 +3,11 @@
 
 ## Description
 
-This repository is created as a solution for the 62teknologi-senior-backend-test challenge.
+This repository is created as a solution for the 62teknologi-senior-backend-test.
 
 ### How To Run This Project
 
-> Make Sure to modify `config.json` first
+> Make sure to modify `config.json` first
 
 #### Run the Applications
 
