@@ -3,6 +3,7 @@ package posgresql
 import (
 	"62teknologi-senior-backend-test-muhammad-hajid-al-akhtar/domain"
 	"context"
+	"fmt"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -15,7 +16,7 @@ func NewMysqlBusinessRepository(conn *gorm.DB) domain.BusinessRepository {
 	return &mysqlBusinessRepository{conn}
 }
 
-func (m mysqlBusinessRepository) Find(ctx context.Context, term string, sortBy string, limit int, offset int, openAt string) ([]domain.Business, error) {
+func (m mysqlBusinessRepository) Find(ctx context.Context, term string, sortBy string, limit int, offset int, latitude float64, longitude float64) ([]domain.Business, error) {
 	var businesses []domain.Business
 	query := m.conn.Model(&domain.Business{})
 
@@ -31,8 +32,12 @@ func (m mysqlBusinessRepository) Find(ctx context.Context, term string, sortBy s
 		query = query.Where("name ILIKE ?", "%"+term+"%")
 	}
 
-	if openAt != "" {
-		query = query.Where("openAt ILIKE ?", openAt)
+	if latitude != 0 {
+		query = query.Where("latitude = ?", latitude)
+	}
+
+	if longitude != 0 {
+		query = query.Where("longitude = ?", longitude)
 	}
 
 	switch sortBy {
@@ -47,6 +52,7 @@ func (m mysqlBusinessRepository) Find(ctx context.Context, term string, sortBy s
 	}
 
 	err := query.Find(&businesses).Error
+	fmt.Println(err)
 	return businesses, err
 
 }

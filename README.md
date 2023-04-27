@@ -3,40 +3,47 @@
 
 ## Description
 
-This repository is intended as an answer to 62teknologi-senior-backend-test challenge.
-
+This repository is created as a solution for the 62teknologi-senior-backend-test challenge.
 
 ### How To Run This Project
 
-> Make Sure you have run the article.sql in your mysql
-
-Since the project already use Go Module, I recommend to put the source code in any folder but GOPATH.
-
-#### Run the Testing
-
-```bash
-$ make tests
-```
+> Make Sure to modify `config.json` first
 
 #### Run the Applications
 
-Here is the steps to run it with `docker-compose`
-
 ```bash
-#move to directory
+
+# Move to the directory called "workspace"
 $ cd workspace
 
-# Clone into your workspace
-$ git clone https://github.com/bxcodec/go-clean-arch.git
+# Clone the repository into your workspace
+$ git clone https://github.com/hajidalakhtar/62teknologi-senior-backend-test-muhammad-hajid-al-akhtar.git
 
-#move to project
-$ cd go-clean-arch
+# Navigate to the project directory
+$ cd 62teknologi-senior-backend-test-muhammad-hajid-al-akhtar
 
-# Run the application
-$ make up
+# Install the dependencies and tidy up the go.mod file
+$ go mod tidy
 
-# The hot reload will running
-
-# Execute the call in another terminal
-$ curl localhost:9090/articles
+# Start the server 
+$ make serve
 ```
+
+
+
+### Example
+Endpoints:
+
+* `[GET] /token/generate` 
+* `[GET] /business_search/search`
+* `[POST] /business_search`
+* `[PUT] /business_search/:id`
+* `[DEL] /business_search/:id`
+
+>`[GET] /token/generate` is used to generate a JWT Token.
+
+Default port 3000.
+
+
+
+

@@ -108,7 +108,19 @@ func (b BusinessHandler) FindBusiness(c *fiber.Ctx) error {
 
 	term := c.Query("term")
 	sortBy := c.Query("sort_by")
-	openAt := c.Query("open_at")
+
+	latitude := c.Query("latitude")
+	latitudeFloat, ok := strconv.ParseFloat(latitude, 64)
+	if ok != nil {
+		latitudeFloat = 0
+	}
+
+	longitude := c.Query("longitude")
+	longitudeFloat, ok := strconv.ParseFloat(longitude, 64)
+	if ok != nil {
+		longitudeFloat = 0
+	}
+
 	limit := c.Query("limit")
 	limitInt, ok := strconv.Atoi(limit)
 	if ok != nil {
@@ -120,7 +132,7 @@ func (b BusinessHandler) FindBusiness(c *fiber.Ctx) error {
 		offsetInt = 0
 	}
 
-	businesses, err := b.BusinessUsecase.Find(c.Context(), term, sortBy, limitInt, offsetInt, openAt)
+	businesses, err := b.BusinessUsecase.Find(c.Context(), term, sortBy, limitInt, offsetInt, latitudeFloat, longitudeFloat)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(ResponseError{
 			Code:        domain.ErrInternal,

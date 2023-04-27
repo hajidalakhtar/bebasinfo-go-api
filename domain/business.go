@@ -52,14 +52,14 @@ type Location struct {
 }
 
 type BusinessUsecase interface {
-	Find(ctx context.Context, term string, sortBy string, limit int, offset int, openAt string) ([]Business, error)
+	Find(ctx context.Context, term string, sortBy string, limit int, offset int, latitude float64, longitude float64) ([]Business, error)
 	Store(ctx context.Context, bs *Business) error
 	Update(ctx context.Context, bs *Business, id uuid.UUID) error
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
 type BusinessRepository interface {
-	Find(ctx context.Context, term string, sortBy string, limit int, offset int, openAt string) ([]Business, error)
+	Find(ctx context.Context, term string, sortBy string, limit int, offset int, latitude float64, longitude float64) ([]Business, error)
 	Store(ctx context.Context, bs *Business) error
 	Update(ctx context.Context, bs *Business, id uuid.UUID) error
 	Delete(ctx context.Context, id uuid.UUID) error

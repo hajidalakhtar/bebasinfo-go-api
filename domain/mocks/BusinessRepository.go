@@ -15,14 +15,14 @@ func NewBusinessRepository(mock mock.Mock) domain.BusinessRepository {
 	return &BusinessRepository{Mock: mock}
 }
 
-func (_m BusinessRepository) Find(ctx context.Context, term string, sortBy string, limit int, offset int, openAt string) ([]domain.Business, error) {
-	ret := _m.Mock.Called(ctx, term, sortBy, limit, offset, openAt)
+func (_m BusinessRepository) Find(ctx context.Context, term string, sortBy string, limit int, offset int, latitude float64, longitude float64) ([]domain.Business, error) {
+	ret := _m.Mock.Called(ctx, term, sortBy, limit, offset, latitude, longitude)
 
 	var r0 []domain.Business
 	var r1 error
 
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, int, int, string) ([]domain.Business, error)); ok {
-		r0, r1 = rf(ctx, term, sortBy, limit, offset, openAt)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, int, int, float64, float64) ([]domain.Business, error)); ok {
+		r0, r1 = rf(ctx, term, sortBy, limit, offset, latitude, longitude)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]domain.Business)

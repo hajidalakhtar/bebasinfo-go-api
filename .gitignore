@@ -1,6 +1,10 @@
 tmp
 tmp_app
 go.mod
+go.sum
 .DS_Store
 .air.toml
+.idea
+.
+
 

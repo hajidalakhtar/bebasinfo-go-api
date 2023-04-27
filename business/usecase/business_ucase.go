@@ -19,8 +19,8 @@ func NewBusinessUsecase(u domain.BusinessRepository, timeout time.Duration) doma
 	}
 }
 
-func (b businessUsecase) Find(ctx context.Context, term string, sortBy string, limit int, offset int, openAt string) ([]domain.Business, error) {
-	return b.businessRepo.Find(ctx, term, sortBy, limit, offset, openAt)
+func (b businessUsecase) Find(ctx context.Context, term string, sortBy string, limit int, offset int, latitude float64, longitude float64) ([]domain.Business, error) {
+	return b.businessRepo.Find(ctx, term, sortBy, limit, offset, latitude, longitude)
 }
 
 func (b businessUsecase) Store(ctx context.Context, bs *domain.Business) error {

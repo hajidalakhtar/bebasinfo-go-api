@@ -302,21 +302,22 @@ func TestUserUsecase_FindBusiness(t *testing.T) {
 	sortBy := "review_count"
 	limit := 10
 	offset := 0
-	openAt := "09:00"
+	latitude := 43.616389
+	longitude := -116.203056
 
 	t.Run("success", func(t *testing.T) {
-		mockBusinessRepo.Mock.On("Find", mock.Anything, mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string")).Return(businesses, nil).Once()
+		mockBusinessRepo.Mock.On("Find", mock.Anything, mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64")).Return(businesses, nil).Once()
 
 		u := NewBusinessUsecase(mockBusinessRepo, time.Second*2)
 
-		list, err := u.Find(context.TODO(), term, sortBy, limit, offset, openAt)
+		list, err := u.Find(context.TODO(), term, sortBy, limit, offset, latitude, longitude)
 		assert.NoError(t, err)
 		assert.Len(t, list, len(businesses))
 	})
 	t.Run("error-failed", func(t *testing.T) {
-		mockBusinessRepo.Mock.On("Find", mock.Anything, mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("string")).Return([]domain.Business{}, errors.New("Unexpected")).Once()
+		mockBusinessRepo.Mock.On("Find", mock.Anything, mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("int"), mock.AnythingOfType("int"), mock.AnythingOfType("float64"), mock.AnythingOfType("float64")).Return([]domain.Business{}, errors.New("Unexpected")).Once()
 		u := NewBusinessUsecase(mockBusinessRepo, time.Second*2)
-		_, err := u.Find(context.TODO(), term, sortBy, limit, offset, openAt)
+		_, err := u.Find(context.TODO(), term, sortBy, limit, offset, latitude, longitude)
 		assert.Error(t, err)
 	})
 }
