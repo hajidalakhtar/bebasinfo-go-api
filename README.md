@@ -12,11 +12,7 @@ This repository is created as a solution for the 62teknologi-senior-backend-test
 #### Run the Applications
 
 ```bash
-
-# Move to the directory called "workspace"
-$ cd workspace
-
-# Clone the repository into your workspace
+# Clone the repository
 $ git clone https://github.com/hajidalakhtar/62teknologi-senior-backend-test-muhammad-hajid-al-akhtar.git
 
 # Navigate to the project directory
