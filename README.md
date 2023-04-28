@@ -27,8 +27,8 @@ $ make serve
 
 
 
-### Example
-Endpoints:
+### Endpoints
+>`[GET] /token/generate` is used to generate a JWT Token.
 
 * `[GET] /token/generate` 
 * `[GET] /business_search/search`
@@ -36,7 +36,6 @@ Endpoints:
 * `[PUT] /business_search/:id`
 * `[DEL] /business_search/:id`
 
->`[GET] /token/generate` is used to generate a JWT Token.
 
 Default port 3000.
 
