@@ -1,4 +1,4 @@
-# 62teknologi-senior-backend-test-Muhammad-Hajid-Al-Akhtar
+# bebasinfo
 
 
 ## Description
@@ -13,10 +13,10 @@ This repository is created as a solution for the 62teknologi-senior-backend-test
 
 ```bash
 # Clone the repository
-$ git clone https://github.com/hajidalakhtar/62teknologi-senior-backend-test-muhammad-hajid-al-akhtar.git
+$ git clone https://github.com/hajidalakhtar/bebasinfo.git
 
 # Navigate to the project directory
-$ cd 62teknologi-senior-backend-test-muhammad-hajid-al-akhtar
+$ cd bebasinfo
 
 # Install the dependencies and tidy up the go.mod file
 $ go mod tidy

@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"62teknologi-senior-backend-test-muhammad-hajid-al-akhtar/domain"
+	"bebasinfo/domain"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"

@@ -1,12 +1,13 @@
 package main
 
 import (
-	_authsHttpDelivery "62teknologi-senior-backend-test-muhammad-hajid-al-akhtar/auth/delivery/http"
-	_businessHttpDelivery "62teknologi-senior-backend-test-muhammad-hajid-al-akhtar/business/delivery/http"
-	_businessRepo "62teknologi-senior-backend-test-muhammad-hajid-al-akhtar/business/repository/posgresql"
-	_businessUsecase "62teknologi-senior-backend-test-muhammad-hajid-al-akhtar/business/usecase"
-	"62teknologi-senior-backend-test-muhammad-hajid-al-akhtar/helper"
-	"62teknologi-senior-backend-test-muhammad-hajid-al-akhtar/pkg/database"
+	_authsHttpDelivery "bebasinfo/auth/delivery/http"
+	"bebasinfo/helper"
+	_newsHttpDelivery "bebasinfo/news/delivery/http"
+	_newsRepoPG "bebasinfo/news/repository/posgresql"
+	_newsRepoRSS "bebasinfo/news/repository/rss"
+	_newsUsecase "bebasinfo/news/usecase"
+	"bebasinfo/pkg/database"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -35,18 +36,18 @@ func main() {
 		CaseSensitive: true,
 		StrictRouting: true,
 		ServerHeader:  "Fiber",
-		AppName:       "62teknologi-senior-backend-test-muhammad-hajid-al-akhtar",
+		AppName:       "bebasinfo",
 	})
 
 	// Init Repository
-
-	br := _businessRepo.NewMysqlBusinessRepository(dbConn)
+	pnr := _newsRepoPG.NewPosgresqlNewsRepository(dbConn)
+	rnr := _newsRepoRSS.NewRSSNewsRepository()
 
 	// Init Usecase
-	bu := _businessUsecase.NewBusinessUsecase(br, timeoutContext)
+	bu := _newsUsecase.NewNewsUsecase(pnr, rnr, timeoutContext)
 
 	// Init Delivery
-	_businessHttpDelivery.NewBusinessHandler(app, bu)
+	_newsHttpDelivery.NewNewsHandler(app, bu)
 	_authsHttpDelivery.NewAuthHandler(app)
 
 	err := app.Listen(portService)

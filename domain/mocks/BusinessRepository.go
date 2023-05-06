@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"62teknologi-senior-backend-test-muhammad-hajid-al-akhtar/domain"
+	"bebasinfo/domain"
 	"context"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"

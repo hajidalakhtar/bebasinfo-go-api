@@ -1,39 +1,49 @@
 package usecase
 
 import (
-	"62teknologi-senior-backend-test-muhammad-hajid-al-akhtar/domain"
+	"bebasinfo/domain"
 	"context"
-	"github.com/google/uuid"
 	"time"
 )
 
-type businessUsecase struct {
-	businessRepo   domain.BusinessRepository
-	contextTimeout time.Duration
+type newsUsecase struct {
+	pgNewsRepository  domain.PosgresqlNewsRepository
+	rssNewsRepository domain.RSSNewsRepository
+	contextTimeout    time.Duration
 }
 
-func NewBusinessUsecase(u domain.BusinessRepository, timeout time.Duration) domain.BusinessUsecase {
-	return &businessUsecase{
-		businessRepo:   u,
-		contextTimeout: timeout,
+func NewNewsUsecase(pnr domain.PosgresqlNewsRepository, rnr domain.RSSNewsRepository, timeout time.Duration) domain.NewsUsecase {
+	return &newsUsecase{
+		pgNewsRepository:  pnr,
+		rssNewsRepository: rnr,
+		contextTimeout:    timeout,
 	}
 }
 
-func (b businessUsecase) Find(ctx context.Context, term string, sortBy string, limit int, offset int, latitude float64, longitude float64) ([]domain.Business, error) {
-	return b.businessRepo.Find(ctx, term, sortBy, limit, offset, latitude, longitude)
+func (n newsUsecase) Find(ctx context.Context, date string, source string) ([]domain.News, error) {
+	return n.pgNewsRepository.Find(ctx, date, source)
 }
 
-func (b businessUsecase) Store(ctx context.Context, bs *domain.Business) error {
-	return b.businessRepo.Store(ctx, bs)
+func (n newsUsecase) Store(ctx context.Context, source string) ([]domain.News, error) {
+	//news := []domain.News{}
+	news, _ := n.rssNewsRepository.GetFromRSS(ctx, source)
+	err := n.pgNewsRepository.Store(ctx, news)
 
+	return news, err
 }
 
-func (b businessUsecase) Update(ctx context.Context, bs *domain.Business, id uuid.UUID) error {
-	return b.businessRepo.Update(ctx, bs, id)
-
-}
-
-func (b businessUsecase) Delete(ctx context.Context, id uuid.UUID) error {
-	return b.businessRepo.Delete(ctx, id)
-
-}
+//
+//func (b businessUsecase) Store(ctx context.Context, bs *domain.Business) error {
+//	return b.businessRepo.Store(ctx, bs)
+//
+//}
+//
+//func (b businessUsecase) Update(ctx context.Context, bs *domain.Business, id uuid.UUID) error {
+//	return b.businessRepo.Update(ctx, bs, id)
+//
+//}
+//
+//func (b businessUsecase) Delete(ctx context.Context, id uuid.UUID) error {
+//	return b.businessRepo.Delete(ctx, id)
+//
+//}

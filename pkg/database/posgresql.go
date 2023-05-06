@@ -1,8 +1,7 @@
 package database
 
 import (
-	"62teknologi-senior-backend-test-muhammad-hajid-al-akhtar/domain"
-	"62teknologi-senior-backend-test-muhammad-hajid-al-akhtar/pkg/database/seeder"
+	"bebasinfo/domain"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -23,9 +22,8 @@ func NewPosgresqlDatabase(dbHost string, dbPort string, dbUser string, dbPass st
 
 	}
 
-	dbConn.Migrator().DropTable(&domain.Business{}, &domain.Category{})
-	dbConn.AutoMigrate(&domain.Business{}, &domain.Category{})
-	seeder.Seed(dbConn)
-
+	dbConn.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
+	dbConn.Migrator().DropTable(&domain.News{}, &domain.Image{})
+	dbConn.AutoMigrate(&domain.News{}, &domain.Image{})
 	return dbConn
 }

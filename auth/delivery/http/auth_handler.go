@@ -1,7 +1,7 @@
 package http
 
 import (
-	"62teknologi-senior-backend-test-muhammad-hajid-al-akhtar/helper"
+	"bebasinfo/helper"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
