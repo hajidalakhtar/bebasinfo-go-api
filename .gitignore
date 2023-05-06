@@ -4,6 +4,6 @@ go.sum
 .DS_Store
 .air.toml
 .idea
-.
+config.json
 
 
