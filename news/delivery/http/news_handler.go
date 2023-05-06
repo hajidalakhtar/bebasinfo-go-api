@@ -50,7 +50,7 @@ func (b NewsHandler) FindNews(c *fiber.Ctx) error {
 
 	return c.JSON(domain.WebResponse{
 		Code:    http.StatusOK,
-		Message: "",
+		Message: "Success get news",
 		Data:    news,
 	})
 

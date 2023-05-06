@@ -22,7 +22,7 @@ func NewPosgresqlDatabase(dbHost string, dbPort string, dbUser string, dbPass st
 	}
 
 	//dbConn.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
-	//dbConn.Migrator().DropTable(&domain.News{}, &domain.Image{})
-	//dbConn.AutoMigrate(&domain.News{}, &domain.Image{})
+	//dbConn.Migrator().DropTable(&domain.News{}, &domain.Image{}, &domain.User{})
+	//dbConn.AutoMigrate(&domain.News{}, &domain.Image{}, &domain.User{})
 	return dbConn
 }
