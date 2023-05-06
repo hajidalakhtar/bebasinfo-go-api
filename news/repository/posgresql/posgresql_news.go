@@ -2,8 +2,8 @@ package posgresql
 
 import (
 	"bebasinfo/domain"
+	"bebasinfo/news/repository/helper"
 	"context"
-	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -15,34 +15,30 @@ func NewPosgresqlNewsRepository(conn *gorm.DB) domain.PosgresqlNewsRepository {
 	return &posgresqlNewsRepository{conn}
 }
 
-func (m posgresqlNewsRepository) Store(ctx context.Context, ns []domain.News) error {
+func (m posgresqlNewsRepository) Store(ctx context.Context, ns domain.News) error {
 	return m.conn.Create(&ns).Error
+}
+
+func (m posgresqlNewsRepository) FindByTitle(ctx context.Context, title string) (domain.News, error) {
+	var news domain.News
+	err := m.conn.Where("title = ?", title).First(&news).Error
+	return news, err
 }
 
 func (m posgresqlNewsRepository) Find(ctx context.Context, date string, source string) ([]domain.News, error) {
 	var news []domain.News
 	query := m.conn.Preload("Image").Model(&domain.News{})
+	selectedSource := helper.GetSelectedSource(source)
 
 	if date != "" {
-		//query = query.Offset(offset)
+		//query = query.Offset()
 	}
 	if source != "" {
-		//query = query.Offset(offset)
+		query = query.Where("source", selectedSource.Name)
+
 	}
 
-	//switch sortBy {
-	//case "best_match":
-	//	query = query.Order("ASC")
-	//case "rating":
-	//	query = query.Order("rating DESC")
-	//case "review_count":
-	//	query = query.Order("review_count DESC")
-	//case "distance":
-	//	query = query.Order("distance ASC")
-	//}
-
 	err := query.Find(&news).Error
-	fmt.Println(err)
 	return news, err
 
 }

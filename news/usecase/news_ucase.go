@@ -25,11 +25,19 @@ func (n newsUsecase) Find(ctx context.Context, date string, source string) ([]do
 }
 
 func (n newsUsecase) Store(ctx context.Context, source string) ([]domain.News, error) {
-	//news := []domain.News{}
-	news, _ := n.rssNewsRepository.GetFromRSS(ctx, source)
-	err := n.pgNewsRepository.Store(ctx, news)
-
-	return news, err
+	var news []domain.News
+	newsFromRSS, _ := n.rssNewsRepository.GetFromRSS(ctx, source)
+	for _, newsItem := range newsFromRSS {
+		_, err := n.pgNewsRepository.FindByTitle(ctx, newsItem.Title)
+		if err != nil {
+			err = n.pgNewsRepository.Store(ctx, newsItem)
+			if err != nil {
+				return nil, err
+			}
+			news = append(news, newsItem)
+		}
+	}
+	return news, nil
 }
 
 //

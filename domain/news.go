@@ -7,7 +7,7 @@ import (
 
 type News struct {
 	ID      uuid.UUID `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
-	Title   string    ` json:"title"`
+	Title   string    ` json:"title" gorm:"unique"`
 	Link    string    ` json:"link"`
 	Content string    ` json:"content"`
 	Date    string    ` json:"date"`
@@ -31,7 +31,8 @@ type NewsUsecase interface {
 
 type PosgresqlNewsRepository interface {
 	Find(ctx context.Context, date string, source string) ([]News, error)
-	Store(ctx context.Context, ns []News) error
+	Store(ctx context.Context, ns News) error
+	FindByTitle(ctx context.Context, title string) (News, error)
 }
 
 type RSSNewsRepository interface {

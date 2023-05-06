@@ -1,4 +1,4 @@
-package rss
+package helper
 
 import (
 	"bebasinfo/domain"
@@ -8,7 +8,11 @@ import (
 func RSSToNews(rss *gofeed.Feed, source string) []domain.News {
 	var news []domain.News
 	for _, item := range rss.Items {
-		image := EnclosuresToImages(item.Enclosures)
+		var image []domain.Image
+		if item.Enclosures != nil {
+			image = EnclosuresToImages(item.Enclosures)
+		}
+
 		news = append(news, domain.News{
 			Title:   item.Title,
 			Link:    item.Link,

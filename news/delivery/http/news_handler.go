@@ -2,14 +2,15 @@ package http
 
 import (
 	"bebasinfo/domain"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
 
 type (
 	ResponseError struct {
-		Code        domain.ErrorCode `json:"code"`
-		Description string           `json:"description"`
+		Code    domain.ErrorCode `json:"code"`
+		Message string           `json:"message"`
 	}
 )
 
@@ -25,10 +26,6 @@ func NewNewsHandler(app *fiber.App, ns domain.NewsUsecase) {
 	app.Get("/news/search", handler.FindNews)
 	app.Get("/store/rss/news", handler.StoreFromRSS)
 
-	//app.Post("/business", middleware.JWTMiddleware, middleware.AdminACL, handler.Store)
-	//app.Delete("/business/:id", middleware.JWTMiddleware, middleware.AdminACL, handler.Delete)
-	//app.Put("/business/:id", middleware.JWTMiddleware, middleware.AdminACL, handler.Update)
-
 }
 
 func (b NewsHandler) FindNews(c *fiber.Ctx) error {
@@ -37,8 +34,8 @@ func (b NewsHandler) FindNews(c *fiber.Ctx) error {
 	source := c.Query("source")
 	if source == "" {
 		return c.Status(http.StatusBadRequest).JSON(ResponseError{
-			Code:        domain.ErrInvalidInput,
-			Description: "source is required",
+			Code:    domain.ErrInvalidInput,
+			Message: "source is required",
 		})
 	}
 
@@ -46,34 +43,40 @@ func (b NewsHandler) FindNews(c *fiber.Ctx) error {
 	news, err := b.NewsUsecase.Find(c.Context(), date, source)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(ResponseError{
-			Code:        domain.ErrInternal,
-			Description: err.Error(),
+			Code:    domain.ErrInternal,
+			Message: err.Error(),
 		})
 	}
 
-	return c.JSON(fiber.Map{
-		"businesses": news,
+	return c.JSON(domain.WebResponse{
+		Code:    http.StatusOK,
+		Message: "",
+		Data:    news,
 	})
+
 }
 
 func (b NewsHandler) StoreFromRSS(c *fiber.Ctx) error {
 	source := c.Query("source")
 	if source == "" {
 		return c.Status(http.StatusBadRequest).JSON(ResponseError{
-			Code:        domain.ErrInvalidInput,
-			Description: "source is required",
+			Code:    domain.ErrInvalidInput,
+			Message: "source is required",
 		})
 	}
 
 	news, err := b.NewsUsecase.Store(c.Context(), source)
 	if err != nil {
+		fmt.Print(err.Error())
 		return c.Status(http.StatusInternalServerError).JSON(ResponseError{
-			Code:        domain.ErrInternal,
-			Description: err.Error(),
+			Code:    domain.ErrInternal,
+			Message: err.Error(),
 		})
 	}
 
-	return c.JSON(fiber.Map{
-		"data": news,
+	return c.JSON(domain.WebResponse{
+		Code:    http.StatusOK,
+		Message: "Success store news from RSS",
+		Data:    news,
 	})
 }

@@ -2,6 +2,7 @@ package rss
 
 import (
 	"bebasinfo/domain"
+	"bebasinfo/news/repository/helper"
 	"context"
 	"fmt"
 	"github.com/mmcdole/gofeed"
@@ -16,7 +17,7 @@ func NewRSSNewsRepository() *rssNewsRepository {
 
 func (r rssNewsRepository) GetFromRSS(ctx context.Context, source string) ([]domain.News, error) {
 
-	selectedSource := GetSelectedSource(source)
+	selectedSource := helper.GetSelectedSource(source)
 	if selectedSource.Link == "" {
 		return nil, fmt.Errorf("source not found")
 	}
@@ -26,6 +27,6 @@ func (r rssNewsRepository) GetFromRSS(ctx context.Context, source string) ([]dom
 		fmt.Println("Error parsing RSS feed:", err)
 	}
 
-	news := RSSToNews(feed, selectedSource.Name)
+	news := helper.RSSToNews(feed, selectedSource.Name)
 	return news, nil
 }

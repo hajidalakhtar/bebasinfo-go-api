@@ -1,7 +1,6 @@
 package database
 
 import (
-	"bebasinfo/domain"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -22,8 +21,8 @@ func NewPosgresqlDatabase(dbHost string, dbPort string, dbUser string, dbPass st
 
 	}
 
-	dbConn.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
-	dbConn.Migrator().DropTable(&domain.News{}, &domain.Image{})
-	dbConn.AutoMigrate(&domain.News{}, &domain.Image{})
+	//dbConn.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
+	//dbConn.Migrator().DropTable(&domain.News{}, &domain.Image{})
+	//dbConn.AutoMigrate(&domain.News{}, &domain.Image{})
 	return dbConn
 }
