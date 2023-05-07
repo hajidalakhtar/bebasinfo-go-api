@@ -1,11 +1,9 @@
 package domain
 
-type ErrorCode string
-
 const (
-	ErrInvalidInput ErrorCode = "INVALID_INPUT" // 400
-	ErrUnauthorized ErrorCode = "UNAUTHORIZED"  // 401
-	ErrForbidden    ErrorCode = "FORBIDDEN"     // 403
-	ErrNotFound     ErrorCode = "NOT_FOUND"     // 404
-	ErrInternal     ErrorCode = "INTERNAL"      // 500
+	ErrInvalidInput string = "INVALID_INPUT" // 400
+	ErrUnauthorized string = "UNAUTHORIZED"  // 401
+	ErrForbidden    string = "FORBIDDEN"     // 403
+	ErrNotFound     string = "NOT_FOUND"     // 404
+	ErrInternal     string = "INTERNAL"      // 500
 )

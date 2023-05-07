@@ -3,6 +3,7 @@ package usecase
 import (
 	"bebasinfo/domain"
 	"context"
+	"math"
 	"time"
 )
 
@@ -20,8 +21,26 @@ func NewNewsUsecase(pnr domain.PosgresqlNewsRepository, rnr domain.RSSNewsReposi
 	}
 }
 
-func (n newsUsecase) Find(ctx context.Context, date string, source string) ([]domain.News, error) {
-	return n.pgNewsRepository.Find(ctx, date, source)
+func (n newsUsecase) Find(ctx context.Context, date string, source string, page int, limit int) ([]domain.News, domain.PaginatedResponse, error) {
+	news, total, err := n.pgNewsRepository.Find(ctx, date, source, page, limit)
+	totalPages := int(math.Ceil(float64(total) / float64(limit)))
+	nextPage := page + 1
+	if nextPage > totalPages {
+		nextPage = 0
+	}
+	prevPage := page - 1
+	if prevPage < 1 {
+		prevPage = 0
+	}
+
+	paginate := domain.PaginatedResponse{
+		TotalItems:  total,
+		TotalPages:  totalPages,
+		CurrentPage: page,
+		NextPage:    nextPage,
+		PrevPage:    prevPage,
+	}
+	return news, paginate, err
 }
 
 func (n newsUsecase) Store(ctx context.Context, source string) ([]domain.News, error) {

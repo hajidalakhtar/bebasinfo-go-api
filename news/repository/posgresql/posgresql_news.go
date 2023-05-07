@@ -25,34 +25,31 @@ func (m posgresqlNewsRepository) FindByTitle(ctx context.Context, title string) 
 	return news, err
 }
 
-func (m posgresqlNewsRepository) Find(ctx context.Context, date string, source string) ([]domain.News, error) {
+func (m posgresqlNewsRepository) Find(ctx context.Context, date string, source string, page int, limit int) ([]domain.News, int64, error) {
+
 	var news []domain.News
-	query := m.conn.Preload("Image").Model(&domain.News{})
+	var count int64
+
+	offset := (page - 1) * limit
 	selectedSource := helper.GetSelectedSource(source)
+
+	err := m.conn.Model(&domain.News{}).Where("source", selectedSource.Name).Count(&count).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	query := m.conn.Preload("Image").Model(&domain.News{}).Offset(offset).Limit(limit)
 
 	if date != "" {
 		//query = query.Offset()
 	}
+
 	if source != "" {
 		query = query.Where("source", selectedSource.Name)
 
 	}
 
-	err := query.Find(&news).Error
-	return news, err
+	err = query.Find(&news).Error
+	return news, count, err
 
 }
-
-//func (m mysqlBusinessRepository) Store(ctx context.Context, bs *domain.Business) error {
-//	return m.conn.Create(&bs).Error
-//}
-//
-//func (m mysqlBusinessRepository) Update(ctx context.Context, bs *domain.Business, id uuid.UUID) error {
-//	return m.conn.Where("id", id).Updates(&bs).Error
-//}
-//
-//func (m mysqlBusinessRepository) Delete(ctx context.Context, id uuid.UUID) error {
-//	//INFO: HARD DELETE
-//	return m.conn.Unscoped().Delete(&domain.Business{}, id).Error
-//
-//}

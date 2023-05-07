@@ -5,13 +5,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
-)
-
-type (
-	ResponseError struct {
-		Code    domain.ErrorCode `json:"code"`
-		Message string           `json:"message"`
-	}
+	"strconv"
 )
 
 type NewsHandler struct {
@@ -33,25 +27,43 @@ func (b NewsHandler) FindNews(c *fiber.Ctx) error {
 
 	source := c.Query("source")
 	if source == "" {
-		return c.Status(http.StatusBadRequest).JSON(ResponseError{
-			Code:    domain.ErrInvalidInput,
+		return c.Status(http.StatusBadRequest).JSON(domain.WebResponse{
+			Code:    http.StatusBadRequest,
+			Status:  domain.ErrInvalidInput,
 			Message: "source is required",
 		})
 	}
 
 	date := c.Query("date")
-	news, err := b.NewsUsecase.Find(c.Context(), date, source)
+	page := c.Query("page", "1")
+	pageInt, err := strconv.Atoi(page)
+
+	limit := c.Query("limit", "10")
+	limitInt, err := strconv.Atoi(limit)
+
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(ResponseError{
-			Code:    domain.ErrInternal,
+		return c.Status(http.StatusBadRequest).JSON(domain.WebResponse{
+			Code:    http.StatusBadRequest,
+			Status:  domain.ErrInvalidInput,
+			Message: "source is required",
+		})
+	}
+
+	news, paginate, err := b.NewsUsecase.Find(c.Context(), date, source, pageInt, limitInt)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(domain.WebResponse{
+			Code:    http.StatusInternalServerError,
+			Status:  domain.ErrInternal,
 			Message: err.Error(),
 		})
 	}
 
-	return c.JSON(domain.WebResponse{
-		Code:    http.StatusOK,
-		Message: "Success get news",
-		Data:    news,
+	return c.JSON(domain.WebRespPaginate{
+		Code:     http.StatusOK,
+		Status:   "OK",
+		Message:  "Success get news",
+		Data:     news,
+		Paginate: paginate,
 	})
 
 }
@@ -59,8 +71,9 @@ func (b NewsHandler) FindNews(c *fiber.Ctx) error {
 func (b NewsHandler) StoreFromRSS(c *fiber.Ctx) error {
 	source := c.Query("source")
 	if source == "" {
-		return c.Status(http.StatusBadRequest).JSON(ResponseError{
-			Code:    domain.ErrInvalidInput,
+		return c.Status(http.StatusBadRequest).JSON(domain.WebResponse{
+			Code:    http.StatusBadRequest,
+			Status:  domain.ErrInvalidInput,
 			Message: "source is required",
 		})
 	}
@@ -68,14 +81,16 @@ func (b NewsHandler) StoreFromRSS(c *fiber.Ctx) error {
 	news, err := b.NewsUsecase.Store(c.Context(), source)
 	if err != nil {
 		fmt.Print(err.Error())
-		return c.Status(http.StatusInternalServerError).JSON(ResponseError{
-			Code:    domain.ErrInternal,
+		return c.Status(http.StatusInternalServerError).JSON(domain.WebResponse{
+			Code:    http.StatusInternalServerError,
+			Status:  domain.ErrInternal,
 			Message: err.Error(),
 		})
 	}
 
 	return c.JSON(domain.WebResponse{
 		Code:    http.StatusOK,
+		Status:  "OK",
 		Message: "Success store news from RSS",
 		Data:    news,
 	})

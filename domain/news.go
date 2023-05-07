@@ -23,14 +23,12 @@ type Image struct {
 }
 
 type NewsUsecase interface {
-	Find(ctx context.Context, date string, source string) ([]News, error)
+	Find(ctx context.Context, date string, source string, page int, limit int) ([]News, PaginatedResponse, error)
 	Store(ctx context.Context, source string) ([]News, error)
-	//Update(ctx context.Context, bs *Business, id uuid.UUID) error
-	//Delete(ctx context.Context, id uuid.UUID) error
 }
 
 type PosgresqlNewsRepository interface {
-	Find(ctx context.Context, date string, source string) ([]News, error)
+	Find(ctx context.Context, date string, source string, page int, limit int) ([]News, int64, error)
 	Store(ctx context.Context, ns News) error
 	FindByTitle(ctx context.Context, title string) (News, error)
 }

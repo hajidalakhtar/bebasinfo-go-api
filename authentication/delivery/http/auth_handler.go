@@ -8,12 +8,6 @@ import (
 	"net/http"
 )
 
-type (
-	ResponseError struct {
-		Code    domain.ErrorCode `json:"code"`
-		Message string           `json:"message"`
-	}
-)
 type AuthHandler struct {
 	AuthUsecase domain.AuthUsecase
 }
@@ -33,16 +27,18 @@ func (u *AuthHandler) Register(c *fiber.Ctx) error {
 	username := c.FormValue("username")
 
 	if email == "" || password == "" || username == "" {
-		return c.Status(http.StatusBadRequest).JSON(ResponseError{
-			Code:    domain.ErrInvalidInput,
+		return c.Status(http.StatusBadRequest).JSON(domain.WebResponse{
+			Code:    http.StatusBadRequest,
+			Status:  domain.ErrInvalidInput,
 			Message: "email, password, and username is required",
 		})
 	}
 
 	result, err := u.AuthUsecase.Register(c.Context(), username, password, email)
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(ResponseError{
-			Code:    domain.ErrInternal,
+		return c.Status(http.StatusInternalServerError).JSON(domain.WebResponse{
+			Code:    http.StatusInternalServerError,
+			Status:  domain.ErrInternal,
 			Message: err.Error(),
 		})
 	}
@@ -58,8 +54,9 @@ func (u *AuthHandler) Login(c *fiber.Ctx) error {
 	password := c.FormValue("password")
 	result, isSuccess, _ := u.AuthUsecase.Login(c.Context(), email, password)
 	if !isSuccess {
-		return c.Status(http.StatusUnauthorized).JSON(ResponseError{
-			Code:    domain.ErrUnauthorized,
+		return c.Status(http.StatusUnauthorized).JSON(domain.WebResponse{
+			Code:    http.StatusUnauthorized,
+			Status:  domain.ErrUnauthorized,
 			Message: "Email or Password is wrong",
 		})
 	}
@@ -73,8 +70,9 @@ func (u *AuthHandler) Login(c *fiber.Ctx) error {
 func (u *AuthHandler) GetMe(c *fiber.Ctx) error {
 	userID, ok := c.Context().Value("userID").(string)
 	if !ok {
-		return c.Status(http.StatusInternalServerError).JSON(ResponseError{
-			Code:    domain.ErrInternal,
+		return c.Status(http.StatusInternalServerError).JSON(domain.WebResponse{
+			Code:    http.StatusInternalServerError,
+			Status:  domain.ErrInternal,
 			Message: "Error when parsing userID",
 		})
 	}
@@ -83,8 +81,9 @@ func (u *AuthHandler) GetMe(c *fiber.Ctx) error {
 
 	result, err := u.AuthUsecase.GetMe(c.Context(), userUUID)
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(ResponseError{
-			Code:    domain.ErrInternal,
+		return c.Status(http.StatusInternalServerError).JSON(domain.WebResponse{
+			Code:    http.StatusInternalServerError,
+			Status:  domain.ErrInternal,
 			Message: err.Error(),
 		})
 
@@ -92,6 +91,7 @@ func (u *AuthHandler) GetMe(c *fiber.Ctx) error {
 
 	return c.JSON(domain.WebResponse{
 		Code:    http.StatusOK,
+		Status:  "OK",
 		Message: "Success get user",
 		Data:    result,
 	})
