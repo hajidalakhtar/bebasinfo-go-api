@@ -3,6 +3,7 @@ package usecase
 import (
 	"bebasinfo/domain"
 	"context"
+	"github.com/google/uuid"
 	"math"
 	"time"
 )
@@ -10,19 +11,26 @@ import (
 type newsUsecase struct {
 	pgNewsRepository  domain.PosgresqlNewsRepository
 	rssNewsRepository domain.RSSNewsRepository
+	apiNewsRepository domain.APINewsRepository
 	contextTimeout    time.Duration
 }
 
-func NewNewsUsecase(pnr domain.PosgresqlNewsRepository, rnr domain.RSSNewsRepository, timeout time.Duration) domain.NewsUsecase {
+func NewNewsUsecase(pnr domain.PosgresqlNewsRepository, rnr domain.RSSNewsRepository, inr domain.APINewsRepository, timeout time.Duration) domain.NewsUsecase {
 	return &newsUsecase{
 		pgNewsRepository:  pnr,
 		rssNewsRepository: rnr,
+		apiNewsRepository: inr,
 		contextTimeout:    timeout,
 	}
 }
 
-func (n newsUsecase) Find(ctx context.Context, date string, source string, page int, limit int) ([]domain.News, domain.PaginatedResponse, error) {
-	news, total, err := n.pgNewsRepository.Find(ctx, date, source, page, limit)
+func (n newsUsecase) Find(ctx context.Context, newsId uuid.UUID) ([]domain.News, error) {
+	news, _, err := n.pgNewsRepository.Find(ctx, newsId, "", "", 1, 10)
+	return news, err
+}
+
+func (n newsUsecase) Search(ctx context.Context, date string, source string, page int, limit int) ([]domain.News, domain.PaginatedResponse, error) {
+	news, total, err := n.pgNewsRepository.Find(ctx, uuid.Nil, date, source, page, limit)
 	totalPages := int(math.Ceil(float64(total) / float64(limit)))
 	nextPage := page + 1
 	if nextPage > totalPages {
@@ -43,10 +51,27 @@ func (n newsUsecase) Find(ctx context.Context, date string, source string, page 
 	return news, paginate, err
 }
 
-func (n newsUsecase) Store(ctx context.Context, source string) ([]domain.News, error) {
+// -------
+// newsResoure = rss, newsapi, all
+// source(for rss) = detik, kompas, cnn, all
+// category(for newsapi) = technology, health, sports, business, science, entertainment, general
+// -------
+func (n newsUsecase) Store(ctx context.Context, newsResource string, category string, source string) ([]domain.News, error) {
 	var news []domain.News
-	newsFromRSS, _ := n.rssNewsRepository.GetFromRSS(ctx, source)
-	for _, newsItem := range newsFromRSS {
+
+	switch newsResource {
+	case "rss":
+		news, _ = n.rssNewsRepository.GetFromRSS(ctx, source)
+	case "newsapi":
+		news, _ = n.apiNewsRepository.GetFromAPI(ctx, category)
+	default:
+		newsApi, _ := n.rssNewsRepository.GetFromRSS(ctx, source)
+		news = append(news, newsApi...)
+		newsRss, _ := n.apiNewsRepository.GetFromAPI(ctx, category)
+		news = append(news, newsRss...)
+	}
+
+	for _, newsItem := range news {
 		_, err := n.pgNewsRepository.FindByTitle(ctx, newsItem.Title)
 		if err != nil {
 			err = n.pgNewsRepository.Store(ctx, newsItem)
@@ -58,19 +83,3 @@ func (n newsUsecase) Store(ctx context.Context, source string) ([]domain.News, e
 	}
 	return news, nil
 }
-
-//
-//func (b businessUsecase) Store(ctx context.Context, bs *domain.Business) error {
-//	return b.businessRepo.Store(ctx, bs)
-//
-//}
-//
-//func (b businessUsecase) Update(ctx context.Context, bs *domain.Business, id uuid.UUID) error {
-//	return b.businessRepo.Update(ctx, bs, id)
-//
-//}
-//
-//func (b businessUsecase) Delete(ctx context.Context, id uuid.UUID) error {
-//	return b.businessRepo.Delete(ctx, id)
-//
-//}

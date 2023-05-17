@@ -6,6 +6,10 @@
     "timeout": 2
   },
   "secretKey": "62tek",
+  "newsapi": {
+    "base_url": "https://newsapi.org/v2",
+    "token": "75f13a59b371493a9380d8f73bd23342"
+  },
   "database": {
     "host": "localhost",
     "port": "5432",
@@ -14,3 +18,5 @@
     "name": "bebasinfo"
   }
 }
+
+

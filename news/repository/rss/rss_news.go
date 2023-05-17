@@ -11,7 +11,7 @@ import (
 type rssNewsRepository struct {
 }
 
-func NewRSSNewsRepository() *rssNewsRepository {
+func NewRSSNewsRepository() domain.RSSNewsRepository {
 	return &rssNewsRepository{}
 }
 

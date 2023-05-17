@@ -4,6 +4,7 @@ import (
 	"bebasinfo/domain"
 	"bebasinfo/news/repository/helper"
 	"context"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +26,7 @@ func (m posgresqlNewsRepository) FindByTitle(ctx context.Context, title string) 
 	return news, err
 }
 
-func (m posgresqlNewsRepository) Find(ctx context.Context, date string, source string, page int, limit int) ([]domain.News, int64, error) {
+func (m posgresqlNewsRepository) Find(ctx context.Context, id uuid.UUID, date string, source string, page int, limit int) ([]domain.News, int64, error) {
 
 	var news []domain.News
 	var count int64
@@ -40,6 +41,12 @@ func (m posgresqlNewsRepository) Find(ctx context.Context, date string, source s
 
 	query := m.conn.Preload("Image").Model(&domain.News{}).Offset(offset).Limit(limit)
 
+	if id != uuid.Nil {
+
+		query = query.Where("id", id)
+
+	}
+
 	if date != "" {
 		//query = query.Offset()
 	}
@@ -50,6 +57,7 @@ func (m posgresqlNewsRepository) Find(ctx context.Context, date string, source s
 	}
 
 	err = query.Find(&news).Error
+
 	return news, count, err
 
 }

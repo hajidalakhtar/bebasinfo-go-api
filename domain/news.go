@@ -22,17 +22,46 @@ type Image struct {
 	Type   string    `json:"type,omitempty"`
 }
 
+// API struct for News API
+type NewsApiResp struct {
+	Status       string           `json:"status"`
+	TotalResults int              `json:"totalResults"`
+	Articles     []NewsApiArticle `json:"articles"`
+}
+
+type NewsApiArticle struct {
+	Source      NewsApiSource `json:"source"`
+	Author      string        `json:"author"`
+	Title       string        `json:"title"`
+	Description string        `json:"description"`
+	Url         string        `json:"url"`
+	UrlToImage  string        `json:"urlToImage"`
+	PublishedAt string        `json:"publishedAt"`
+	Content     string        `json:"content"`
+}
+
+type NewsApiSource struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
 type NewsUsecase interface {
-	Find(ctx context.Context, date string, source string, page int, limit int) ([]News, PaginatedResponse, error)
-	Store(ctx context.Context, source string) ([]News, error)
+	Search(ctx context.Context, date string, source string, page int, limit int) ([]News, PaginatedResponse, error)
+	Find(ctx context.Context, newsId uuid.UUID) ([]News, error)
+
+	Store(ctx context.Context, newsResource string, category string, source string) ([]News, error)
 }
 
 type PosgresqlNewsRepository interface {
-	Find(ctx context.Context, date string, source string, page int, limit int) ([]News, int64, error)
+	Find(ctx context.Context, id uuid.UUID, date string, source string, page int, limit int) ([]News, int64, error)
 	Store(ctx context.Context, ns News) error
 	FindByTitle(ctx context.Context, title string) (News, error)
 }
 
 type RSSNewsRepository interface {
 	GetFromRSS(ctx context.Context, source string) ([]News, error)
+}
+
+type APINewsRepository interface {
+	GetFromAPI(ctx context.Context, category string) ([]News, error)
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"bebasinfo/helper"
 	_newsHttpDelivery "bebasinfo/news/delivery/http"
+	_newsRepoAPI "bebasinfo/news/repository/api"
 	_newsRepoPG "bebasinfo/news/repository/posgresql"
 	_newsRepoRSS "bebasinfo/news/repository/rss"
 	_newsUsecase "bebasinfo/news/usecase"
@@ -31,6 +32,9 @@ func main() {
 	dbUser := viper.GetString(`database.user`)
 	dbPass := viper.GetString(`database.pass`)
 	dbName := viper.GetString(`database.name`)
+	baseUrl := viper.GetString(`newsapi.base_url`)
+	token := viper.GetString(`newsapi.token`)
+
 	portService := viper.GetString(`server.address`)
 	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
 	dbConn := database.NewPosgresqlDatabase(dbHost, dbPort, dbUser, dbPass, dbName)
@@ -46,12 +50,13 @@ func main() {
 	// Init Repository
 	pnr := _newsRepoPG.NewPosgresqlNewsRepository(dbConn)
 	rnr := _newsRepoRSS.NewRSSNewsRepository()
+	inr := _newsRepoAPI.NewAPINewsRepository(baseUrl, token)
 
 	uns := _userRepoPG.NewPosgresqlUserRepository(dbConn)
 	anr := _authRepoPG.NewPosgresqlAuthRepository(dbConn)
 
 	// Init Usecase
-	bu := _newsUsecase.NewNewsUsecase(pnr, rnr, timeoutContext)
+	bu := _newsUsecase.NewNewsUsecase(pnr, rnr, inr, timeoutContext)
 	au := _authUsecase.NewAuthUsecase(anr, uns, timeoutContext)
 
 	// Init Delivery
