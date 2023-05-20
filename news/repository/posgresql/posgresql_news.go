@@ -32,7 +32,17 @@ func (m posgresqlNewsRepository) Find(ctx context.Context, id uuid.UUID, date st
 	var news []domain.News
 	var count int64
 
-	startOfWeek := time.Now().AddDate(0, 0, -int(time.Now().Weekday())+1)
+	now := time.Now()
+
+	// Calculate the number of days to subtract to get to the start of the week (Monday)
+	weekday := now.Weekday()
+	var daysToSubtract int
+	if weekday == time.Sunday {
+		daysToSubtract = 6
+	} else {
+		daysToSubtract = int(weekday - time.Monday)
+	}
+	startOfWeek := now.AddDate(0, 0, -daysToSubtract)
 
 	offset := (page - 1) * limit
 
@@ -49,11 +59,12 @@ func (m posgresqlNewsRepository) Find(ctx context.Context, id uuid.UUID, date st
 
 	if len(source) > 0 {
 		selectedSource := helper.GetSelectedSource(source)
-		sourceName := make([]string, len(selectedSource))
+		sourceName := make([]string, 0)
 		for _, item := range selectedSource {
 			sourceName = append(sourceName, item.Name)
 		}
 
+		//fmt.Println(startOfWeek.Format("2006-01-02 15:04:05"))
 		query = query.Where("source IN ?", sourceName).Where("date::timestamp >= ?", startOfWeek.Format("2006-01-02 15:04:05"))
 	}
 
