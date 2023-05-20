@@ -35,32 +35,38 @@ func (m posgresqlNewsRepository) Find(ctx context.Context, id uuid.UUID, date st
 	startOfWeek := time.Now().AddDate(0, 0, -int(time.Now().Weekday())+1)
 
 	offset := (page - 1) * limit
-	selectedSource := helper.GetSelectedSource(source)
-	sourceName := make([]string, len(selectedSource))
-	for _, item := range selectedSource {
-		sourceName = append(sourceName, item.Name)
-	}
 
-	err := m.conn.Model(&domain.News{}).Where("source IN ?", sourceName).Where("date::timestamp >= ?", startOfWeek.Format("2006-01-02 15:04:05")).Count(&count).Error
-	if err != nil {
-		return nil, 0, err
-	}
+	//totalQuery := m.conn.Model(&domain.News{}).Where("source IN ?", sourceName).Where("date::timestamp >= ?", startOfWeek.Format("2006-01-02 15:04:05")).Count(&count).Error
+	//if err != nil {
+	//	return nil, 0, err
+	//}
 
 	query := m.conn.Preload("Image").Model(&domain.News{}).Offset(offset).Limit(limit)
-	query = query.Where("source IN ?", sourceName).Where("date::timestamp >= ?", startOfWeek.Format("2006-01-02 15:04:05"))
 
 	if id != uuid.Nil {
-
 		query = query.Where("id", id)
+	}
 
+	if len(source) > 0 {
+		selectedSource := helper.GetSelectedSource(source)
+		sourceName := make([]string, len(selectedSource))
+		for _, item := range selectedSource {
+			sourceName = append(sourceName, item.Name)
+		}
+
+		query = query.Where("source IN ?", sourceName).Where("date::timestamp >= ?", startOfWeek.Format("2006-01-02 15:04:05"))
 	}
 
 	if date != "" {
 		//query = query.Offset()
 	}
 
-	err = query.Find(&news).Error
+	err := query.Count(&count).Error
+	if err != nil {
+		return nil, 0, err
+	}
 
+	err = query.Find(&news).Error
 	return news, count, err
 
 }
