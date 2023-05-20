@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"bebasinfo/domain"
+	"bebasinfo/news/usecase/helper"
 	"context"
 	"github.com/google/uuid"
 	"math"
@@ -25,11 +26,11 @@ func NewNewsUsecase(pnr domain.PosgresqlNewsRepository, rnr domain.RSSNewsReposi
 }
 
 func (n newsUsecase) Find(ctx context.Context, newsId uuid.UUID) ([]domain.News, error) {
-	news, _, err := n.pgNewsRepository.Find(ctx, newsId, "", "", 1, 10)
+	news, _, err := n.pgNewsRepository.Find(ctx, newsId, "", nil, 1, 10)
 	return news, err
 }
 
-func (n newsUsecase) Search(ctx context.Context, date string, source string, page int, limit int) ([]domain.News, domain.PaginatedResponse, error) {
+func (n newsUsecase) Search(ctx context.Context, date string, source []string, page int, limit int) ([]domain.News, domain.PaginatedResponse, error) {
 	news, total, err := n.pgNewsRepository.Find(ctx, uuid.Nil, date, source, page, limit)
 	totalPages := int(math.Ceil(float64(total) / float64(limit)))
 	nextPage := page + 1
@@ -56,9 +57,8 @@ func (n newsUsecase) Search(ctx context.Context, date string, source string, pag
 // source(for rss) = detik, kompas, cnn, all
 // category(for newsapi) = technology, health, sports, business, science, entertainment, general
 // -------
-func (n newsUsecase) Store(ctx context.Context, newsResource string, category string, source string) ([]domain.News, error) {
+func (n newsUsecase) Store(ctx context.Context, newsResource string, category string, source []string) ([]domain.News, error) {
 	var news []domain.News
-
 	switch newsResource {
 	case "rss":
 		news, _ = n.rssNewsRepository.GetFromRSS(ctx, source)
@@ -70,8 +70,8 @@ func (n newsUsecase) Store(ctx context.Context, newsResource string, category st
 		newsRss, _ := n.apiNewsRepository.GetFromAPI(ctx, category)
 		news = append(news, newsRss...)
 	}
-
-	for _, newsItem := range news {
+	randNews := helper.ShuffleArray(news)
+	for _, newsItem := range randNews {
 		_, err := n.pgNewsRepository.FindByTitle(ctx, newsItem.Title)
 		if err != nil {
 			err = n.pgNewsRepository.Store(ctx, newsItem)

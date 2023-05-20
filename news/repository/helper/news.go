@@ -59,33 +59,33 @@ func EnclosuresToImages(es []*gofeed.Enclosure) []domain.Image {
 	return images
 }
 
-func GetSelectedSource(source string) domain.Source {
-	switch source {
-	case "suara":
-		return domain.Suara
-	case "cnn":
-		return domain.CNN
-	case "cnbc":
-		return domain.CNBC
-	case "republika":
-		return domain.Republika
-	case "tempo":
-		return domain.Tempo
-	case "antara":
-		return domain.Antara
-	case "kumparan":
-		return domain.Kumparan
-	case "okezone":
-		return domain.Okezone
-	case "liputan6":
-		return domain.Liputan6
-	case "bbc":
-		return domain.BBC
-	case "vice":
-		return domain.Vice
-	case "voa":
-		return domain.VOA
-	default:
-		return domain.Source{}
+func GetSelectedSource(sources []string) []domain.Source {
+	sourcesArr := make([]domain.Source, 0)
+	for _, item := range sources {
+		switch item {
+		case "suara":
+			sourcesArr = append(sourcesArr, domain.Suara)
+		case "cnn":
+			sourcesArr = append(sourcesArr, domain.CNN)
+		case "cnbc":
+			sourcesArr = append(sourcesArr, domain.CNBC)
+		case "republika":
+			sourcesArr = append(sourcesArr, domain.Republika)
+		case "tempo":
+			sourcesArr = append(sourcesArr, domain.Tempo)
+		case "antara":
+			sourcesArr = append(sourcesArr, domain.Antara)
+		case "kumparan":
+			sourcesArr = append(sourcesArr, domain.Kumparan)
+		case "okezone":
+			sourcesArr = append(sourcesArr, domain.Okezone)
+		case "bbc":
+			sourcesArr = append(sourcesArr, domain.BBC)
+		case "vice":
+			sourcesArr = append(sourcesArr, domain.Vice)
+		case "voa":
+			sourcesArr = append(sourcesArr, domain.VOA)
+		}
 	}
+	return sourcesArr
 }

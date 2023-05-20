@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"time"
 )
 
 type posgresqlNewsRepository struct {
@@ -26,20 +27,27 @@ func (m posgresqlNewsRepository) FindByTitle(ctx context.Context, title string) 
 	return news, err
 }
 
-func (m posgresqlNewsRepository) Find(ctx context.Context, id uuid.UUID, date string, source string, page int, limit int) ([]domain.News, int64, error) {
+func (m posgresqlNewsRepository) Find(ctx context.Context, id uuid.UUID, date string, source []string, page int, limit int) ([]domain.News, int64, error) {
 
 	var news []domain.News
 	var count int64
 
+	startOfWeek := time.Now().AddDate(0, 0, -int(time.Now().Weekday())+1)
+
 	offset := (page - 1) * limit
 	selectedSource := helper.GetSelectedSource(source)
+	sourceName := make([]string, len(selectedSource))
+	for _, item := range selectedSource {
+		sourceName = append(sourceName, item.Name)
+	}
 
-	err := m.conn.Model(&domain.News{}).Where("source", selectedSource.Name).Count(&count).Error
+	err := m.conn.Model(&domain.News{}).Where("source IN ?", sourceName).Where("date::timestamp >= ?", startOfWeek.Format("2006-01-02 15:04:05")).Count(&count).Error
 	if err != nil {
 		return nil, 0, err
 	}
 
 	query := m.conn.Preload("Image").Model(&domain.News{}).Offset(offset).Limit(limit)
+	query = query.Where("source IN ?", sourceName).Where("date::timestamp >= ?", startOfWeek.Format("2006-01-02 15:04:05"))
 
 	if id != uuid.Nil {
 
@@ -49,11 +57,6 @@ func (m posgresqlNewsRepository) Find(ctx context.Context, id uuid.UUID, date st
 
 	if date != "" {
 		//query = query.Offset()
-	}
-
-	if source != "" {
-		query = query.Where("source", selectedSource.Name)
-
 	}
 
 	err = query.Find(&news).Error

@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type NewsHandler struct {
@@ -37,6 +38,7 @@ func (b NewsHandler) FindNews(c *fiber.Ctx) error {
 		})
 	}
 
+	sourceArr := strings.Split(source, ",")
 	date := c.Query("date")
 	page := c.Query("page", "1")
 	pageInt, err := strconv.Atoi(page)
@@ -52,7 +54,7 @@ func (b NewsHandler) FindNews(c *fiber.Ctx) error {
 		})
 	}
 
-	news, paginate, err := b.NewsUsecase.Search(c.Context(), date, source, pageInt, limitInt)
+	news, paginate, err := b.NewsUsecase.Search(c.Context(), date, sourceArr, pageInt, limitInt)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(domain.WebResponse{
 			Code:    http.StatusInternalServerError,
@@ -156,7 +158,9 @@ func (b NewsHandler) Store(c *fiber.Ctx) error {
 		}
 	}
 
-	news, err := b.NewsUsecase.Store(c.Context(), newsResource, category, source)
+	sourceArr := strings.Split(source, ",")
+
+	news, err := b.NewsUsecase.Store(c.Context(), newsResource, category, sourceArr)
 	if err != nil {
 		fmt.Print(err.Error())
 		return c.Status(http.StatusInternalServerError).JSON(domain.WebResponse{

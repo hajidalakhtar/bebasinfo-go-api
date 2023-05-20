@@ -41,13 +41,8 @@ var Kumparan = Source{
 }
 
 var Okezone = Source{
-	Link: "https://sindikasi.okezone.com/index.php/rss",
+	Link: "https://sindikasi.okezone.com/index.php/rss/0/RSS2.0",
 	Name: "Okezone",
-}
-
-var Liputan6 = Source{
-	Link: "https://feed.liputan6.com/rss",
-	Name: "Liputan6",
 }
 
 var BBC = Source{
