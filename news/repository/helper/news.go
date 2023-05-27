@@ -5,7 +5,7 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
-func RSSToNews(rss *gofeed.Feed, source string) []domain.News {
+func RSSToNews(rss *gofeed.Feed, source domain.Source) []domain.News {
 	var news []domain.News
 	for _, item := range rss.Items {
 		var image []domain.Image
@@ -14,12 +14,13 @@ func RSSToNews(rss *gofeed.Feed, source string) []domain.News {
 		}
 
 		news = append(news, domain.News{
-			Title:   item.Title,
-			Link:    item.Link,
-			Content: item.Content,
-			Date:    item.Published,
-			Image:   image,
-			Source:  source,
+			Title:    item.Title,
+			Link:     item.Link,
+			Content:  item.Content,
+			Date:     item.Published,
+			Image:    image,
+			Category: source.Category,
+			Source:   source.Name,
 		})
 	}
 	return news

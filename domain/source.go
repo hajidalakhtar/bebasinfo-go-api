@@ -1,48 +1,57 @@
 package domain
 
 type Source struct {
-	Link string
-	Name string
+	Link     string
+	Category string
+	Name     string
 }
 
 var Suara = Source{
-	Link: "https://www.suara.com/rss/bisnis",
-	Name: "Suara.com",
+	Link:     "https://www.suara.com/rss/bisnis",
+	Category: "Bisnis",
+	Name:     "Suara.com",
 }
 
 var CNN = Source{
-	Link: "https://www.cnnindonesia.com/nasional/rss",
-	Name: "CNN Indonesia",
+	Link:     "https://www.cnnindonesia.com/nasional/rss",
+	Category: "Nasional",
+	Name:     "CNN Indonesia",
 }
 
 var CNBC = Source{
-	Link: "https://www.cnbcindonesia.com/news/rss",
-	Name: "CNBC Indonesia",
+	Link:     "https://www.cnbcindonesia.com/news/rss",
+	Category: "Berita Terkini",
+	Name:     "CNBC Indonesia",
 }
 
 var Republika = Source{
-	Link: "https://www.republika.co.id/rss",
-	Name: "Republika",
+	Link:     "https://www.republika.co.id/rss",
+	Category: "Berita Terkini",
+	Name:     "Republika",
 }
 
 var Tempo = Source{
-	Link: "https://rss.tempo.co/",
-	Name: "Tempo",
+	Link:     "https://rss.tempo.co/",
+	Category: "Berita Terkini",
+	Name:     "Tempo",
 }
 
 var Antara = Source{
-	Link: "https://www.antaranews.com/rss/terkini.xml",
-	Name: "Antara",
+	Link:     "https://www.antaranews.com/rss/terkini.xml",
+	Category: "Berita Terkini",
+	Name:     "Antara",
 }
 
 var Kumparan = Source{
-	Link: "https://lapi.kumparan.com/v2.0/rss",
-	Name: "Kumparan",
+	Link:     "https://lapi.kumparan.com/v2.0/rss",
+	Category: "Berita Terkini",
+	Name:     "Kumparan",
 }
 
 var Okezone = Source{
-	Link: "https://sindikasi.okezone.com/index.php/rss/0/RSS2.0",
-	Name: "Okezone",
+	Link:     "https://sindikasi.okezone.com/index.php/rss/0/RSS2.0",
+	Category: "Berita Terkini",
+	Name:     "Okezone",
 }
 
 var BBC = Source{

@@ -32,7 +32,7 @@ func (r rssNewsRepository) GetFromRSS(ctx context.Context, source []string) ([]d
 			fmt.Println("Error parsing RSS feed:", err)
 		}
 
-		news := helper.RSSToNews(feed, source.Name)
+		news := helper.RSSToNews(feed, source)
 		newsArr = append(newsArr, news...)
 	}
 	return newsArr, nil

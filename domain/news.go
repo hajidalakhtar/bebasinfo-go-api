@@ -6,13 +6,14 @@ import (
 )
 
 type News struct {
-	ID      uuid.UUID `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
-	Title   string    ` json:"title" gorm:"unique"`
-	Link    string    ` json:"link"`
-	Content string    ` json:"content"`
-	Date    string    ` json:"date"`
-	Source  string    ` json:"source"`
-	Image   []Image   `gorm:"many2many" json:"image"`
+	ID       uuid.UUID `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
+	Title    string    ` json:"title" gorm:"unique"`
+	Link     string    ` json:"link"`
+	Category string    `json:"category"`
+	Content  string    ` json:"content"`
+	Date     string    ` json:"date"`
+	Source   string    ` json:"source"`
+	Image    []Image   `gorm:"many2many" json:"image"`
 }
 
 type Image struct {
