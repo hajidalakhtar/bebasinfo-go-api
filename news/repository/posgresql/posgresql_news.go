@@ -29,9 +29,6 @@ func (m posgresqlNewsRepository) FindByTitle(ctx context.Context, title string) 
 
 func (m posgresqlNewsRepository) Find(ctx context.Context, id uuid.UUID, date string, source []string, page int, limit int) ([]domain.News, int64, error) {
 
-	var news []domain.News
-	var count int64
-
 	now := time.Now()
 
 	// Calculate the number of days to subtract to get to the start of the week (Monday)
@@ -44,14 +41,10 @@ func (m posgresqlNewsRepository) Find(ctx context.Context, id uuid.UUID, date st
 	}
 	startOfWeek := now.AddDate(0, 0, -daysToSubtract)
 
+	var news []domain.News
+	var count int64
 	offset := (page - 1) * limit
-
-	//totalQuery := m.conn.Model(&domain.News{}).Where("source IN ?", sourceName).Where("date::timestamp >= ?", startOfWeek.Format("2006-01-02 15:04:05")).Count(&count).Error
-	//if err != nil {
-	//	return nil, 0, err
-	//}
-
-	query := m.conn.Preload("Image").Model(&domain.News{}).Offset(offset).Limit(limit)
+	query := m.conn.Debug().Preload("Image").Where("date::timestamp >= ?", startOfWeek.Format("2006-01-02 15:04:05")).Model(&domain.News{})
 
 	if id != uuid.Nil {
 		query = query.Where("id", id)
@@ -63,21 +56,20 @@ func (m posgresqlNewsRepository) Find(ctx context.Context, id uuid.UUID, date st
 		for _, item := range selectedSource {
 			sourceName = append(sourceName, item.Name)
 		}
-
-		//fmt.Println(startOfWeek.Format("2006-01-02 15:04:05"))
-		query = query.Where("source IN ?", sourceName).Where("date::timestamp >= ?", startOfWeek.Format("2006-01-02 15:04:05"))
+		query = query.Where("source IN ?", sourceName)
 	}
 
 	if date != "" {
 		//query = query.Offset()
 	}
+	query = query.Order("id::uuid")
 
 	err := query.Count(&count).Error
 	if err != nil {
 		return nil, 0, err
 	}
 
-	err = query.Find(&news).Error
+	err = query.Offset(offset).Limit(limit).Find(&news).Error
 	return news, count, err
 
 }
