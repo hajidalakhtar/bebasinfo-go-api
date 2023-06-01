@@ -29,12 +29,13 @@ func NewNewsUsecase(pnr domain.PosgresqlNewsRepository, rnr domain.RSSNewsReposi
 }
 
 func (n newsUsecase) Find(ctx context.Context, newsId uuid.UUID) ([]domain.News, error) {
-	news, _, err := n.pgNewsRepository.Find(ctx, newsId, "", nil, 1, 10)
+	news, _, err := n.pgNewsRepository.Find(ctx, newsId, "", nil, nil, 1, 10)
 	return news, err
 }
 
-func (n newsUsecase) Search(ctx context.Context, date string, source []string, page int, limit int) ([]domain.News, domain.PaginatedResponse, error) {
-	news, total, err := n.pgNewsRepository.Find(ctx, uuid.Nil, date, source, page, limit)
+func (n newsUsecase) Search(ctx context.Context, date string, source []string, category []string, page int, limit int) ([]domain.News, domain.PaginatedResponse, error) {
+
+	news, total, err := n.pgNewsRepository.Find(ctx, uuid.Nil, date, source, category, page, limit)
 	totalPages := int(math.Ceil(float64(total) / float64(limit)))
 	nextPage := page + 1
 	if nextPage > totalPages {

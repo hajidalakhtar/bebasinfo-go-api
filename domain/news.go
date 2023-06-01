@@ -70,7 +70,7 @@ type NewsApiSource struct {
 }
 
 type NewsUsecase interface {
-	Search(ctx context.Context, date string, source []string, page int, limit int) ([]News, PaginatedResponse, error)
+	Search(ctx context.Context, date string, source []string, category []string, page int, limit int) ([]News, PaginatedResponse, error)
 	Find(ctx context.Context, newsId uuid.UUID) ([]News, error)
 
 	Store(ctx context.Context, newsResource string, category string, source []string) ([]News, error)
@@ -78,7 +78,7 @@ type NewsUsecase interface {
 }
 
 type PosgresqlNewsRepository interface {
-	Find(ctx context.Context, id uuid.UUID, date string, source []string, page int, limit int) ([]News, int64, error)
+	Find(ctx context.Context, id uuid.UUID, date string, source []string, category []string, page int, limit int) ([]News, int64, error)
 	Store(ctx context.Context, ns News) error
 
 	FindByTitle(ctx context.Context, title string) (News, error)

@@ -31,8 +31,10 @@ func NewNewsHandler(app *fiber.App, ns domain.NewsUsecase, logger *zap.Logger) {
 
 func (b NewsHandler) FindNews(c *fiber.Ctx) error {
 	var news []domain.News
+	var categoryArr []string
 
 	source := c.Query("source")
+	category := c.Query("category")
 	if source == "" {
 		return c.Status(http.StatusBadRequest).JSON(domain.WebResponse{
 			Code:    http.StatusBadRequest,
@@ -42,6 +44,10 @@ func (b NewsHandler) FindNews(c *fiber.Ctx) error {
 	}
 
 	sourceArr := strings.Split(source, ",")
+	if category != "" {
+		categoryArr = strings.Split(category, ",")
+	}
+
 	date := c.Query("date")
 	page := c.Query("page", "1")
 	pageInt, err := strconv.Atoi(page)
@@ -57,7 +63,7 @@ func (b NewsHandler) FindNews(c *fiber.Ctx) error {
 		})
 	}
 
-	news, paginate, err := b.NewsUsecase.Search(c.Context(), date, sourceArr, pageInt, limitInt)
+	news, paginate, err := b.NewsUsecase.Search(c.Context(), date, sourceArr, categoryArr, pageInt, limitInt)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(domain.WebResponse{
 			Code:    http.StatusInternalServerError,

@@ -2,11 +2,9 @@ package posgresql
 
 import (
 	"bebasinfo/domain"
-	"bebasinfo/news/repository/helper"
 	"context"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"time"
 )
 
 type posgresqlNewsRepository struct {
@@ -27,34 +25,25 @@ func (m posgresqlNewsRepository) FindByTitle(ctx context.Context, title string) 
 	return news, err
 }
 
-func (m posgresqlNewsRepository) Find(ctx context.Context, id uuid.UUID, date string, source []string, page int, limit int) ([]domain.News, int64, error) {
-
-	now := time.Now()
-
-	// Calculate the number of days to subtract to get to the start of the week (Monday)
-	weekday := now.Weekday()
-	var daysToSubtract int
-	if weekday == time.Sunday {
-		daysToSubtract = 6
-	} else {
-		daysToSubtract = int(weekday - time.Monday)
-	}
-	startOfWeek := now.AddDate(0, 0, -daysToSubtract)
+func (m posgresqlNewsRepository) Find(ctx context.Context, id uuid.UUID, date string, source []string, category []string, page int, limit int) ([]domain.News, int64, error) {
 
 	var news []domain.News
 	var count int64
 	offset := (page - 1) * limit
-	query := m.conn.Debug().Preload("Image").Where("date::timestamp >= ?", startOfWeek.Format("2006-01-02 15:04:05")).Model(&domain.News{})
+	query := m.conn.Debug().Preload("Image").Model(&domain.News{})
 
 	if id != uuid.Nil {
 		query = query.Where("id", id)
 	}
 
+	if len(category) > 0 {
+		query = query.Where("category IN ?", category)
+	}
+
 	if len(source) > 0 {
-		selectedSource := helper.GetSelectedSource(source)
 		sourceName := make([]string, 0)
-		for _, item := range selectedSource {
-			sourceName = append(sourceName, item.Name)
+		for _, item := range source {
+			sourceName = append(sourceName, item)
 		}
 		query = query.Where("source IN ?", sourceName)
 	}
