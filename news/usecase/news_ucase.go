@@ -2,26 +2,28 @@ package usecase
 
 import (
 	"bebasinfo/domain"
-	"bebasinfo/news/usecase/helper"
 	"context"
+	"errors"
 	"github.com/google/uuid"
 	"math"
 	"time"
 )
 
 type newsUsecase struct {
-	pgNewsRepository  domain.PosgresqlNewsRepository
-	rssNewsRepository domain.RSSNewsRepository
-	apiNewsRepository domain.APINewsRepository
-	contextTimeout    time.Duration
+	pgNewsRepository      domain.PosgresqlNewsRepository
+	rssNewsRepository     domain.RSSNewsRepository
+	apiNewsRepository     domain.APINewsRepository
+	apiNewsDataRepository domain.APINewsDataRepository
+	contextTimeout        time.Duration
 }
 
-func NewNewsUsecase(pnr domain.PosgresqlNewsRepository, rnr domain.RSSNewsRepository, inr domain.APINewsRepository, timeout time.Duration) domain.NewsUsecase {
+func NewNewsUsecase(pnr domain.PosgresqlNewsRepository, rnr domain.RSSNewsRepository, inr domain.APINewsRepository, ndr domain.APINewsDataRepository, timeout time.Duration) domain.NewsUsecase {
 	return &newsUsecase{
-		pgNewsRepository:  pnr,
-		rssNewsRepository: rnr,
-		apiNewsRepository: inr,
-		contextTimeout:    timeout,
+		pgNewsRepository:      pnr,
+		rssNewsRepository:     rnr,
+		apiNewsRepository:     inr,
+		apiNewsDataRepository: ndr,
+		contextTimeout:        timeout,
 	}
 }
 
@@ -57,6 +59,7 @@ func (n newsUsecase) Search(ctx context.Context, date string, source []string, p
 // source(for rss) = detik, kompas, cnn, all
 // category(for newsapi) = technology, health, sports, business, science, entertainment, general
 // -------
+
 func (n newsUsecase) Store(ctx context.Context, newsResource string, category string, source []string) ([]domain.News, error) {
 	var news []domain.News
 	switch newsResource {
@@ -64,14 +67,14 @@ func (n newsUsecase) Store(ctx context.Context, newsResource string, category st
 		news, _ = n.rssNewsRepository.GetFromRSS(ctx, source)
 	case "newsapi":
 		news, _ = n.apiNewsRepository.GetFromAPI(ctx, category)
+	case "newsdata":
+		news, _ = n.apiNewsDataRepository.GetFromAPI(ctx, category)
 	default:
-		newsApi, _ := n.rssNewsRepository.GetFromRSS(ctx, source)
-		news = append(news, newsApi...)
-		newsRss, _ := n.apiNewsRepository.GetFromAPI(ctx, category)
-		news = append(news, newsRss...)
+		return nil, errors.New("news resource not found")
+
 	}
-	randNews := helper.ShuffleArray(news)
-	for _, newsItem := range randNews {
+	//randNews := helper.ShuffleArray(news)
+	for _, newsItem := range news {
 		_, err := n.pgNewsRepository.FindByTitle(ctx, newsItem.Title)
 		if err != nil {
 			err = n.pgNewsRepository.Store(ctx, newsItem)

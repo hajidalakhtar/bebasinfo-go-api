@@ -1,4 +1,4 @@
-package rss
+package api
 
 import (
 	"bebasinfo/domain"

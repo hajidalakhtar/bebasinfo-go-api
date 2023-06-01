@@ -30,6 +30,28 @@ type NewsApiResp struct {
 	Articles     []NewsApiArticle `json:"articles"`
 }
 
+type NewsDataApiResp struct {
+	Status       string           `json:"status"`
+	TotalResults int              `json:"totalResults"`
+	Results      []NewsApiResults `json:"results"`
+}
+
+type NewsApiResults struct {
+	Title       string      `json:"title"`
+	Link        string      `json:"link"`
+	Keywords    []string    `json:"keywords"`
+	Creator     interface{} `json:"creator"`
+	VideoURL    interface{} `json:"video_url"`
+	Description string      `json:"description"`
+	Content     string      `json:"content"`
+	PubDate     string      `json:"pubDate"`
+	ImageURL    string      `json:"image_url"`
+	SourceID    string      `json:"source_id"`
+	Category    []string    `json:"category"`
+	Country     []string    `json:"country"`
+	Language    string      `json:"language"`
+}
+
 type NewsApiArticle struct {
 	Source      NewsApiSource `json:"source"`
 	Author      string        `json:"author"`
@@ -64,5 +86,9 @@ type RSSNewsRepository interface {
 }
 
 type APINewsRepository interface {
+	GetFromAPI(ctx context.Context, category string) ([]News, error)
+}
+
+type APINewsDataRepository interface {
 	GetFromAPI(ctx context.Context, category string) ([]News, error)
 }

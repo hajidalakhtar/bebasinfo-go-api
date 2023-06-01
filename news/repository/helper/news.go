@@ -48,6 +48,29 @@ func ApiToNews(news []domain.NewsApiArticle) []domain.News {
 	return newsDomain
 }
 
+func NewsDataApiToNews(news []domain.NewsApiResults, category string) []domain.News {
+	var newsDomain []domain.News
+
+	for _, newsItem := range news {
+		newsDomain = append(newsDomain, domain.News{
+			Title:    newsItem.Title,
+			Link:     newsItem.Link,
+			Content:  newsItem.Content,
+			Category: category,
+			Date:     newsItem.PubDate,
+			Image: []domain.Image{
+				{
+					URL:    newsItem.ImageURL,
+					Length: "10",
+					Type:   "",
+				},
+			},
+			Source: newsItem.SourceID,
+		})
+	}
+	return newsDomain
+}
+
 func EnclosuresToImages(es []*gofeed.Enclosure) []domain.Image {
 	var images []domain.Image
 	for _, enclosure := range es {

@@ -10,6 +10,10 @@
     "base_url": "https://newsapi.org/v2",
     "token": "75f13a59b371493a9380d8f73bd23342"
   },
+  "newsdata": {
+    "base_url": "https://newsdata.io",
+    "token": "pub_134806f820addb8022a5f6536efc05ee27b86"
+  },
   "database": {
     "host": "localhost",
     "port": "5432",
