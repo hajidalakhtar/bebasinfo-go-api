@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"bebasinfo/domain"
+	"bebasinfo/news/usecase/helper"
 	"context"
 	"errors"
 	"github.com/google/uuid"
@@ -68,7 +69,7 @@ func (n newsUsecase) Store(ctx context.Context, newsResource string, category st
 	case "newsapi":
 		news, _ = n.apiNewsRepository.GetFromAPI(ctx, category)
 	case "newsdata":
-		news, _ = n.apiNewsDataRepository.GetFromAPI(ctx, category)
+		news, _, _ = n.apiNewsDataRepository.GetFromAPI(ctx, category, "")
 	default:
 		return nil, errors.New("news resource not found")
 
@@ -85,4 +86,34 @@ func (n newsUsecase) Store(ctx context.Context, newsResource string, category st
 		}
 	}
 	return news, nil
+}
+
+func (n newsUsecase) StoreMultiplePagesFromNewsDataApi(ctx context.Context, category string) ([]domain.News, error) {
+	var merged []domain.News
+	var nextPage string
+
+	for i := 0; i < 5; i++ {
+		news, page, err := n.apiNewsDataRepository.GetFromAPI(ctx, category, nextPage)
+		if err != nil {
+			return nil, err
+		}
+		nextPage = page
+		merged = append(merged, news...)
+	}
+
+	randNews := helper.ShuffleArray(merged)
+	var storedNews []domain.News
+
+	for _, newsItem := range randNews {
+		_, err := n.pgNewsRepository.FindByTitle(ctx, newsItem.Title)
+		if err != nil {
+			err = n.pgNewsRepository.Store(ctx, newsItem)
+			if err != nil {
+				return nil, err
+			}
+			storedNews = append(storedNews, newsItem)
+		}
+	}
+
+	return storedNews, nil
 }

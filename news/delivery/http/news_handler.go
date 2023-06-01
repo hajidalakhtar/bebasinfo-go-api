@@ -2,16 +2,13 @@ package http
 
 import (
 	"bebasinfo/domain"
-	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"github.com/robfig/cron/v3"
 	"go.uber.org/zap"
 	"net/http"
 	"strconv"
 	"strings"
-	"sync"
 )
 
 type NewsHandler struct {
@@ -19,22 +16,16 @@ type NewsHandler struct {
 	Logger      *zap.Logger
 }
 
-var (
-	cronJob *cron.Cron
-	mutex   sync.Mutex
-)
-
 func NewNewsHandler(app *fiber.App, ns domain.NewsUsecase, logger *zap.Logger) {
 	handler := &NewsHandler{
 		NewsUsecase: ns,
 		Logger:      logger,
 	}
 
-	app.Get("/news/cronjob/:status", handler.CronJob)
-
 	app.Get("/news/detail/:id", handler.Find)
 	app.Get("/news/search", handler.FindNews)
 	app.Get("/store/news", handler.Store)
+	app.Get("/store/multiple/newsdata", handler.StoreMultipleNewsData)
 
 }
 
@@ -174,7 +165,6 @@ func (b NewsHandler) Store(c *fiber.Ctx) error {
 
 	news, err := b.NewsUsecase.Store(c.Context(), newsResource, category, sourceArr)
 	if err != nil {
-		fmt.Print(err.Error())
 		return c.Status(http.StatusInternalServerError).JSON(domain.WebResponse{
 			Code:    http.StatusInternalServerError,
 			Status:  domain.ErrInternal,
@@ -190,53 +180,22 @@ func (b NewsHandler) Store(c *fiber.Ctx) error {
 	})
 }
 
-func (b NewsHandler) CronJob(c *fiber.Ctx) error {
-	status := c.Params("status")
-	if status == "start" {
-		startCronJob(b.Logger)
+func (b NewsHandler) StoreMultipleNewsData(c *fiber.Ctx) error {
+
+	category := c.Query("category")
+	news, err := b.NewsUsecase.StoreMultiplePagesFromNewsDataApi(c.Context(), category)
+	if err != nil {
+		c.JSON(domain.WebResponse{
+			Code:    http.StatusInternalServerError,
+			Status:  domain.ErrInternal,
+			Message: err.Error(),
+		})
 	}
 
-	if status == "stop" {
-		stopCronJob()
-	}
-	return c.JSON("cron job : " + status)
-}
-
-func hello() {
-	fmt.Println("Hello, World!")
-}
-
-func startCronJob(log *zap.Logger) {
-
-	log.Info("Create new cron")
-	cronJob := cron.New(cron.WithSeconds())
-	cronJob.AddFunc("*/1 * * * *", func() {
-		log.Info("cron")
+	return c.JSON(domain.WebResponse{
+		Code:    http.StatusOK,
+		Status:  "OK",
+		Message: "Success store news from News Data API",
+		Data:    news,
 	})
-
-	log.Info("Start cron")
-	cronJob.Start()
-
-	//printCronEntries(c.Entries())
-	//time.Sleep(2 * time.Minute)
-	//
-	//// Funcs may also be added to a running Cron
-	//log.Info("Add new job to a running cron")
-	//entryID2, _ := c.AddFunc("*/2 * * * *", func() { log.Info("[Job 2]Every two minutes job\n") })
-	//printCronEntries(c.Entries())
-	//time.Sleep(5 * time.Minute)
-	//
-	////Remove Job2 and add new Job2 that run every 1 minute
-	//log.Info("Remove Job2 and add new Job2 with schedule run every minute")
-	//c.Remove(entryID2)
-	//c.AddFunc("*/1 * * * *", func() { log.Info("[Job 2]Every one minute job\n") })
-	//time.Sleep(5 * time.Minute)
-
-}
-
-func stopCronJob() {
-	cronJob.Stop()
-
-	//scheduler.Clear()
-	//scheduler.Stop()
 }

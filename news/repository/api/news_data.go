@@ -22,9 +22,9 @@ func NewNewsDataRepository(baseUrl string, token string) domain.APINewsDataRepos
 	}
 }
 
-func (a apiNewsDataRepository) GetFromAPI(ctx context.Context, category string) ([]domain.News, error) {
+func (a apiNewsDataRepository) GetFromAPI(ctx context.Context, category string, page string) ([]domain.News, string, error) {
 	var apiResp domain.NewsDataApiResp
-	resp, err := http.Get(a.baseUrl + "/api/1/news?country=id&category=" + category + "&apikey=" + a.token)
+	resp, err := http.Get(a.baseUrl + "/api/1/news?country=id&category=" + category + "&apikey=" + a.token + "&page=" + page)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -34,5 +34,5 @@ func (a apiNewsDataRepository) GetFromAPI(ctx context.Context, category string) 
 	err = json.Unmarshal(body, &apiResp)
 
 	news := helper.NewsDataApiToNews(apiResp.Results, category)
-	return news, nil
+	return news, apiResp.NextPage, nil
 }

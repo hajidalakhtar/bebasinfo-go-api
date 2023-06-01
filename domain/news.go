@@ -34,6 +34,7 @@ type NewsDataApiResp struct {
 	Status       string           `json:"status"`
 	TotalResults int              `json:"totalResults"`
 	Results      []NewsApiResults `json:"results"`
+	NextPage     string           `json:"nextPage"`
 }
 
 type NewsApiResults struct {
@@ -73,11 +74,13 @@ type NewsUsecase interface {
 	Find(ctx context.Context, newsId uuid.UUID) ([]News, error)
 
 	Store(ctx context.Context, newsResource string, category string, source []string) ([]News, error)
+	StoreMultiplePagesFromNewsDataApi(ctx context.Context, category string) ([]News, error)
 }
 
 type PosgresqlNewsRepository interface {
 	Find(ctx context.Context, id uuid.UUID, date string, source []string, page int, limit int) ([]News, int64, error)
 	Store(ctx context.Context, ns News) error
+
 	FindByTitle(ctx context.Context, title string) (News, error)
 }
 
@@ -90,5 +93,5 @@ type APINewsRepository interface {
 }
 
 type APINewsDataRepository interface {
-	GetFromAPI(ctx context.Context, category string) ([]News, error)
+	GetFromAPI(ctx context.Context, category string, page string) ([]News, string, error)
 }
