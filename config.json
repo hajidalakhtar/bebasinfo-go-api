@@ -5,10 +5,10 @@
   "context": {
     "timeout": 2
   },
-  "secretKey": "62tek",
+  "secretKey": "",
   "newsapi": {
     "base_url": "https://newsapi.org/v2",
-    "token": "75f13a59b371493a9380d8f73bd23342"
+    "token": ""
   },
   "newsdata": {
     "base_url": "https://newsdata.io",
@@ -19,7 +19,7 @@
     "port": "5432",
     "user": "postgres",
     "pass": "",
-    "name": "bebasinfo"
+    "name": "postgres"
   }
 }
 

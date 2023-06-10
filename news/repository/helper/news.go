@@ -2,7 +2,9 @@ package helper
 
 import (
 	"bebasinfo/domain"
+	"fmt"
 	"github.com/mmcdole/gofeed"
+	"strings"
 )
 
 func RSSToNews(rss *gofeed.Feed, source domain.Source) []domain.News {
@@ -52,6 +54,14 @@ func NewsDataApiToNews(news []domain.NewsApiResults, category string) []domain.N
 	var newsDomain []domain.News
 
 	for _, newsItem := range news {
+		if newsItem.ImageURL == "" {
+			fmt.Println(newsItem.ImageURL)
+			continue
+		}
+		if strings.Contains(newsItem.Title, "VIDEO:") {
+			fmt.Println(newsItem.Title)
+			continue
+		}
 		newsDomain = append(newsDomain, domain.News{
 			Title:    newsItem.Title,
 			Link:     newsItem.Link,

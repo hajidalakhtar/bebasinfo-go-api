@@ -9,6 +9,7 @@ import (
 )
 
 func NewPosgresqlDatabase(dbHost string, dbPort string, dbUser string, dbPass string, dbName string) *gorm.DB {
+	fmt.Println(dbName)
 	connection := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", dbHost, dbUser, dbPass, dbName, dbPort)
 	val := url.Values{}
 	val.Add("parseTime", "1")

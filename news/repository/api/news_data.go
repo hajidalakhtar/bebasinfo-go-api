@@ -30,7 +30,6 @@ func (a apiNewsDataRepository) GetFromAPI(ctx context.Context, category string, 
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
-
 	err = json.Unmarshal(body, &apiResp)
 
 	news := helper.NewsDataApiToNews(apiResp.Results, category)

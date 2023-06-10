@@ -13,10 +13,10 @@ import (
 	"bebasinfo/pkg/database"
 	"bebasinfo/pkg/utils"
 	_userRepoPG "bebasinfo/user/repository/posgresql"
-	"time"
-
 	"github.com/gofiber/fiber/v2"
+
 	"github.com/spf13/viper"
+	"time"
 )
 
 func init() {
@@ -28,7 +28,6 @@ func init() {
 func main() {
 	utils.InitLogger()
 	logger := utils.GetLogger()
-
 	dbHost := viper.GetString(`database.host`)
 	dbPort := viper.GetString(`database.port`)
 	dbUser := viper.GetString(`database.user`)

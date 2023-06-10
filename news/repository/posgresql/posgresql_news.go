@@ -31,16 +31,15 @@ func (m posgresqlNewsRepository) Find(ctx context.Context, id uuid.UUID, date st
 	var count int64
 	offset := (page - 1) * limit
 	query := m.conn.Debug().Preload("Image").Model(&domain.News{})
-
 	if id != uuid.Nil {
 		query = query.Where("id", id)
 	}
-
 	if len(category) > 0 {
 		query = query.Where("category IN ?", category)
 	}
 
 	if len(source) > 0 {
+		//selectedSource := helper.GetSelectedSource(source)
 		sourceName := make([]string, 0)
 		for _, item := range source {
 			sourceName = append(sourceName, item)

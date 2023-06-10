@@ -93,7 +93,7 @@ func (n newsUsecase) StoreMultiplePagesFromNewsDataApi(ctx context.Context, cate
 	var merged []domain.News
 	var nextPage string
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 40; i++ {
 		news, page, err := n.apiNewsDataRepository.GetFromAPI(ctx, category, nextPage)
 		if err != nil {
 			return nil, err
